@@ -8,10 +8,6 @@
 using namespace std;
 
 char reserved = 'x';
-bool debug = false;
-bool message = true;
-
-using namespace std;
 
 //Full usage of AI
 static string replaceWithQueue(const string& str, queue<int>& q) {
@@ -100,6 +96,7 @@ static int handleExpression(const string& str) {
     bool isString = false;
 
     for (char ch : str) {
+        cout << ch << " " << depth << '\n';
         if (depth == 0) {
             if (ch == '(') {
                 depthZero += reserved;
@@ -125,9 +122,6 @@ static int handleExpression(const string& str) {
             int clone = clones[depth];
             ensureCapacity(order[depth], clone);
             order[depth][clone] += currWord;
-            /*if (debug) {
-                cout << "depth: " << depth << " z: " << clone << " -> " << currWord << '\n';
-            }*/
             currWord = "";
             depth++;
         }
@@ -138,9 +132,6 @@ static int handleExpression(const string& str) {
             clones[depth] += 1;
             ensureCapacity(order[depth], clone);
             order[depth][clone] += currWord;
-            /*if (debug) {
-                cout << "depth: " << depth << " z: " << clone << " -> " << currWord << '\n';
-            }*/
             currWord = "";
             depth--;
         }
@@ -149,15 +140,6 @@ static int handleExpression(const string& str) {
         }
     }
 
-    /*if (message) {
-        cout << "depth: 0 z: 0 -> " << depthZero;
-        for (int i = 0; i < order.size(); i++) {
-            cout << '\n';
-            for (int z = 0; z < order[i].size(); z++) {
-                cout << "depth: " << i << " z: " << z << " -> " << order[i][z] << '\n';
-            }
-        }
-    }*/
     // ## Actually calculating the parenthese values ##
     queue<int> previousValues;
     for (int i = order.size() - 1; i >= 0; i--) {
@@ -179,6 +161,7 @@ int main() {
     while (true) {
         string expression;
         getline(cin, expression);
+        cout << expression << '\n';
         cout << handleExpression(expression) << '\n';
     }
     return 0;
