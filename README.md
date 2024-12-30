@@ -6,4 +6,5 @@ Notes:
 - In test.cpp, there is code to compare it to c++'s performance with math.
 
 https://github.com/user-attachments/assets/02c22ab3-a78c-4bd7-a7e4-1bb9354b49bf
+![image](https://github.com/user-attachments/assets/8a180799-b0b7-4835-9d58-64125bae5e6c)
 
