@@ -1,5 +1,6 @@
 # FastMathCpp
 A program that can parse many layers of parentheses (but ignoring PEMDAS)
+
 Rundown:
 - Can do +, -, *, /, %
 - Supports decimals and doing operations with decimals
