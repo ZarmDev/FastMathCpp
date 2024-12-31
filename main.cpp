@@ -4,13 +4,15 @@
 #include <algorithm>
 #include <vector>
 #include <string>
+#include <cmath>
+#include <iomanip>
 
 using namespace std;
 
 char reserved = 'x';
 
 //Full usage of AI
-static string replaceWithQueue(const string& str, queue<int>& q) {
+static string replaceWithQueue(const string& str, queue<float>& q) {
     string result;
     for (char ch : str) {
         if (ch == reserved && !q.empty()) {
@@ -28,9 +30,9 @@ static string replaceWithQueue(const string& str, queue<int>& q) {
 
 
 // Made by me with the help of AI/research
-static string replaceReserved(const string given, queue<int>& q) {
-    queue<int> copy = q;
-    stack<int> s;
+static string replaceReserved(const string given, queue<float>& q) {
+    queue<float> copy = q;
+    stack<float> s;
 
     string str(given.rbegin(), given.rend());
     // Process the string and replace the reserved character with stack values
@@ -41,16 +43,29 @@ static string replaceReserved(const string given, queue<int>& q) {
     return str;
 }
 
+static bool isInteger(float value) {
+    return floor(value) == value;
+}
 
-// Full usage of AI for this function
-static int parseIntExpressionWithoutVariables(const string& expression) {
-    int result = 0;
-    int currentNumber = 0;
+// AI + me
+static float parseIntExpressionWithoutVariables(const string& expression) {
+    float result = 0.0;
+    float currentNumber = 0;
+    float decimalMultiplier = 0;
     char lastOperation = '+'; // To keep track of the last operation
 
     for (char ch : expression) {
         if (isdigit(ch)) {
-            currentNumber = currentNumber * 10 + (ch - '0');
+            if (decimalMultiplier > 0) {
+                currentNumber += (ch - '0') * decimalMultiplier;
+                decimalMultiplier *= 0.1;
+            }
+            else {
+                currentNumber = currentNumber * 10 + (ch - '0');
+            }
+        }
+        else if (ch == '.') {
+              decimalMultiplier = 0.1;
         }
         else if (ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '%') {
             switch (lastOperation) {
@@ -58,20 +73,31 @@ static int parseIntExpressionWithoutVariables(const string& expression) {
             case '-': result -= currentNumber; break;
             case '*': result *= currentNumber; break;
             case '/': result /= currentNumber; break;
-            case '%': result %= currentNumber; break;
+            case '%':
+                if (isInteger(result) && isInteger(currentNumber)) {
+                    result = static_cast<int>(result) % static_cast<int>(currentNumber);
+                }
+                break;
             }
             currentNumber = 0;
+            decimalMultiplier = 0;
             lastOperation = ch;
         }
     }
 
     // Handle the last number
     switch (lastOperation) {
-    case '+': result += currentNumber; break;
+    case '+':
+        result += currentNumber;
+        break;
     case '-': result -= currentNumber; break;
     case '*': result *= currentNumber; break;
     case '/': result /= currentNumber; break;
-    case '%': result %= currentNumber; break;
+    case '%':
+        if (isInteger(result) && isInteger(currentNumber)) {
+            result = static_cast<int>(result) % static_cast<int>(currentNumber);
+        }
+        break;
     }
 
     return result;
@@ -86,8 +112,10 @@ template <typename T> void ensureCapacity(std::vector<T>& vec, size_t index)
     }
 }
 
+vector<string> methods = {"int", "str", "float"};
+
 // Function created by me + research
-static int handleExpression(const string& str) {
+static float handleExpression(const string& str) {
     vector<vector<string>> order;
     vector<int> clones;
     string currWord;
@@ -96,7 +124,7 @@ static int handleExpression(const string& str) {
     bool isString = false;
 
     for (char ch : str) {
-        cout << ch << " " << depth << '\n';
+        //cout << ch << " " << depth << '\n';
         if (depth == 0) {
             if (ch == '(') {
                 depthZero += reserved;
@@ -141,19 +169,19 @@ static int handleExpression(const string& str) {
     }
 
     // ## Actually calculating the parenthese values ##
-    queue<int> previousValues;
+    queue<float> previousValues;
     for (int i = order.size() - 1; i >= 0; i--) {
         for (int z = order[i].size() - 1; z >= 0; z--) {
             string filled = replaceReserved(order[i][z], previousValues);
-            int val = parseIntExpressionWithoutVariables(filled);
+            float val = parseIntExpressionWithoutVariables(filled);
             previousValues.push(val);
         }
     }
 
     // ## For the first depth ##
     string filled = replaceReserved(depthZero, previousValues);
-    int val = parseIntExpressionWithoutVariables(filled);
-    return val;
+    float valAtZero = parseIntExpressionWithoutVariables(filled);
+    return valAtZero;
 }
 
 int main() {
@@ -161,8 +189,7 @@ int main() {
     while (true) {
         string expression;
         getline(cin, expression);
-        cout << expression << '\n';
-        cout << handleExpression(expression) << '\n';
+        cout << fixed << handleExpression(expression) << '\n';
     }
     return 0;
 }
